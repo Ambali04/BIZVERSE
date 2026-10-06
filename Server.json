@@ -1,0 +1,104 @@
+const express = require("express");
+const http = require("http");
+const WebSocket = require("ws");
+const path = require("path");
+
+const app = express();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/health", (req, res) => {
+  res.json({ status: "BIZVERSE server is running" });
+});
+
+const players = new Map();
+
+function broadcast(data) {
+  const message = JSON.stringify(data);
+
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    }
+  });
+}
+
+wss.on("connection", (ws) => {
+  const id = Math.random().toString(36).substring(2, 10);
+
+  players.set(id, {
+    id,
+    name: `Player ${players.size + 1}`,
+    x: 50,
+    y: 50
+  });
+
+  ws.send(
+    JSON.stringify({
+      type: "welcome",
+      id,
+      players: Array.from(players.values())
+    })
+  );
+
+  broadcast({
+    type: "players",
+    players: Array.from(players.values())
+  });
+
+  ws.on("message", (message) => {
+    try {
+      const data = JSON.parse(message);
+
+      if (data.type === "join") {
+        const player = players.get(id);
+
+        if (player) {
+          player.name = data.name || player.name;
+        }
+      }
+
+      if (data.type === "move") {
+        const player = players.get(id);
+
+        if (player) {
+          player.x = data.x;
+          player.y = data.y;
+        }
+      }
+
+      if (data.type === "chat") {
+        broadcast({
+          type: "chat",
+          name: players.get(id)?.name || "Player",
+          message: data.message
+        });
+      }
+
+      broadcast({
+        type: "players",
+        players: Array.from(players.values())
+      });
+
+    } catch (error) {
+      console.log("Invalid message received");
+    }
+  });
+
+  ws.on("close", () => {
+    players.delete(id);
+
+    broadcast({
+      type: "players",
+      players: Array.from(players.values())
+    });
+  });
+});
+
+const PORT = process.env.PORT || 10000;
+
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`BIZVERSE running on port ${PORT}`);
+});
