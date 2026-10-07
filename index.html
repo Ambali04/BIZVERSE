@@ -215,6 +215,13 @@ console.log("BizVerse connected to Supabase");
   <script>
 window.registerUser = async function() {
   alert("registerUser started");
+  alert(
+  "Missing: " +
+  ["name", "business", "category", "description", "email", "password"]
+    .filter(id => !document.getElementById(id))
+    .join(", ")
+);
+  
   const name = document.getElementById("name").value;
   const business = document.getElementById("business").value;
   const category = document.getElementById("category").value;
