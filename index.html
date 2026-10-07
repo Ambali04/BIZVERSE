@@ -221,7 +221,8 @@ window.registerUser = async function() {
   const description = document.getElementById("description").value;
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-
+alert("Fields read successfully");
+  
   if (!name || !business || !category || !email || !password) {
     alert("Please fill in all required fields.");
     return;
