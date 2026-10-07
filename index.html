@@ -167,8 +167,7 @@
   <input type="email" placeholder="Email">
   <input type="password" placeholder="Create Password">
 
-  <button class="submit">Create Account</button>
-
+  <button class="submit" type="button" onclick="registerUser()">Create Account</button>
   <button class="back" onclick="showSection('home')">
     ← Back
   </button>
@@ -212,6 +211,51 @@ const supabaseClient = supabase.createClient(
 );
 
 console.log("BizVerse connected to Supabase");
+</script>
+  <script>
+async function registerUser() {
+  const name = document.getElementById("name").value;
+  const business = document.getElementById("business").value;
+  const category = document.getElementById("category").value;
+  const description = document.getElementById("description").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  if (!name || !business || !category || !email || !password) {
+    alert("Please fill in all required fields.");
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.signUp({
+    email: email,
+    password: password
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  const user = data.user;
+
+  const { error: businessError } = await supabaseClient
+    .from("businesses")
+    .insert([{
+      user_id: user.id,
+      owner_name: name,
+      business_name: business,
+      category: category,
+      description: description,
+      contact: email
+    }]);
+
+  if (businessError) {
+    alert(businessError.message);
+    return;
+  }
+
+  alert("Account created successfully!");
+}
 </script>
 </body>
 </html>
