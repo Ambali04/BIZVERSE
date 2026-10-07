@@ -149,9 +149,9 @@
   <h2>Create Your BizVerse Account</h2>
 
   <input type="text" name="name" id="name" placeholder="Full Name">
-  <input type="text" placeholder="Business Name">
+<input type="text" id="business" placeholder="Business Name">
 
-  <select>
+<select id="category">
     <option>Select Business Category</option>
     <option>Fashion</option>
     <option>Food</option>
@@ -162,11 +162,9 @@
     <option>Other</option>
   </select>
 
-  <textarea placeholder="Tell us about your business"></textarea>
-
-  <input type="email" placeholder="Email">
-  <input type="password" placeholder="Create Password">
-
+<textarea id="description" placeholder="Tell us about your business"></textarea>
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="password" placeholder="Password">
 <button class="submit" type="button" onclick="registerUser()">Create Account</button>
   <button class="back" onclick="showSection('home')">
     ← Back
@@ -214,13 +212,8 @@ console.log("BizVerse connected to Supabase");
 </script>
   <script>
 window.registerUser = async function() {
-  alert("registerUser started");
-  alert(
-  "Missing: " +
-  ["name", "business", "category", "description", "email", "password"]
-    .filter(id => !document.getElementById(id))
-    .join(", ")
-);
+  
+  
   
   const name = document.getElementById("name").value;
   const business = document.getElementById("business").value;
@@ -228,13 +221,16 @@ window.registerUser = async function() {
   const description = document.getElementById("description").value;
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-alert("Fields read successfully");
+
   
   if (!name || !business || !category || !email || !password) {
     alert("Please fill in all required fields.");
     return;
   }
 alert("Registration function is running");
+
+  alert("About to connect to Supabase");
+  
   const { data, error } = await supabaseClient.auth.signUp({
     email: email,
     password: password
