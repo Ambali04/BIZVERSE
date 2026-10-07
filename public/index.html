@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>BIZVERSE</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      touch-action: none;
+    }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: white;
+    }
+
+    #game {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, #6b6b6b 0 18%, #242424 18% 82%, #6b6b6b 82%);
+    }
+
+    .road {
+      position: absolute;
+      background: #292929;
+    }
+
+    .road.horizontal {
+      width: 100%;
+      height: 90px;
+      top: 45%;
+      left: 0;
+    }
+
+    .road.vertical {
+      height: 100%;
+      width: 90px;
+      left: 45%;
+      top: 0;
+    }
+
+    .building {
+      position: absolute;
+      width: 130px;
+      height: 85px;
+      border-radius: 12px;
+      padding: 18px 8px;
+      text-align: center;
+      font-weight: bold;
+      background: #f5f5f5;
+      color: #111;
+      box-shadow: 0 5px 15px #0008;
+    }
+
+    #market {
+      top: 8%;
+      left: 5%;
+    }
+
+    #bank {
+      top: 8%;
+      right: 5%;
+    }
+
+    #shop {
+      bottom: 8%;
+      left: 5%;
+    }
+
+    #hub {
+      bottom: 8%;
+      right: 5%;
+    }
+
+    .player {
+      position: absolute;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 3px solid white;
+      background: #00d4ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: bold;
+      z-index: 10;
+      transform: translate(-50%, -50%);
+    }
+
+    #hud {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 30;
+      background: #000b;
+      padding: 10px 14px;
+      border-radius: 12px;
+    }
+
+    #status {
+      font-size: 13px;
+      color: #7cff9b;
+    }
+
+    #chat {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      width: 260px;
+      height: 210px;
+      background: #000c;
+      border-radius: 14px;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+    }
+
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    #chatInput {
+      width: 100%;
+      padding: 9px;
+      border: 0;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    #joystick {
+      position: absolute;
+      left: 25px;
+      bottom: 25px;
+      width: 125px;
+      height: 125px;
+      border-radius: 50%;
+      background: #ffffff22;
+      border: 2px solid #ffffff55;
+      z-index: 40;
+    }
+
+    #stick {
+      position: absolute;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: #ffffffaa;
+      left: 33px;
+      top: 33px;
+    }
+
+    #nameBox {
+      position: absolute;
+      inset: 0;
+      z-index: 100;
+      background: #101010;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    #nameBox h1 {
+      font-size: 42px;
+      margin: 0;
+    }
+
+    #nameInput {
+      width: 260px;
+      padding: 13px;
+      border-radius: 8px;
+      border: 0;
+      font-size: 16px;
+    }
+
+    #startBtn {
+      padding: 12px 30px;
+      border: 0;
+      border-radius: 8px;
+      background: #00c853;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    @media (max-width: 600px) {
+      #chat {
+        width: 210px;
+        height: 170px;
+      }
+
+      .building {
+        width: 100px;
+        height: 65px;
+        padding: 12px 4px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="nameBox">
+  <h1>BIZVERSE</h1>
+  <p>Enter your entrepreneur name</p>
+  <input id="nameInput" placeholder="Your name">
+  <button id="startBtn">ENTER BIZVERSE</button>
+</div>
+
+<div id="game">
+
+  <div class="road horizontal"></div>
+  <div class="road vertical"></div>
+
+  <div id="market" class="building">🛒 MARKET</div>
+  <div id="bank" class="building">🏦 BANK</div>
+  <div id="shop" class="building">🏪 YOUR SHOP</div>
+  <div id="hub" class="building">💬 BUSINESS HUB</div>
+
+  <div id="hud">
+    <b>BIZVERSE</b><br>
+    <span id="status">Connecting...</span>
+  </div>
+
+  <div id="chat">
+    <b>💬 Business Hub</b>
+    <div id="messages"></div>
+    <input id="chatInput" placeholder="Message...">
+  </div>
+
+  <div id="joystick">
+    <div id="stick"></div>
+  </div>
+
+</div>
+
+<script>
+
+let socket;
+let myId = null;
+let myName = "";
+let players = {};
+let x = 50;
+let y = 50;
+
+const nameBox = document.getElementById("nameBox");
+const nameInput = document.getElementById("nameInput");
+const startBtn = document.getElementById("startBtn");
+const statusText = document.getElementById("status");
+const game = document.getElementById("game");
+const messages = document.getElementById("messages");
+const chatInput = document.getElementById("chatInput");
+
+startBtn.onclick = () => {
+
+  myName = nameInput.value.trim() || "Entrepreneur";
+
+  nameBox.style.display = "none";
+
+  const protocol =
+    location.protocol === "https:" ? "wss://" : "ws://";
+
+  socket = new WebSocket(
+    protocol + location.host
+  );
+
+  socket.onopen = () => {
+
+    statusText.textContent = "🟢 Online";
+
+    socket.send(JSON.stringify({
+      type: "join",
+      name: myName
+    }));
+  };
+
+  socket.onclose = () => {
+    statusText.textContent = "🔴 Disconnected";
+  };
+
+  socket.onerror = () => {
+    statusText.textContent = "⚠️ Connection error";
+  };
+
+  socket.onmessage = event => {
+
+    const data = JSON.parse(event.data);
+
+    if (data.type === "welcome") {
+      myId = data.id;
+
+      data.players.forEach(player => {
+        players[player.id] = player;
+      });
+
+      drawPlayers();
+    }
+
+    if (data.type === "players") {
+
+      players = {};
+
+      data.players.forEach(player => {
+        players[player.id] = player;
+      });
+
+      drawPlayers();
+    }
+
+    if (data.type === "chat") {
+      addMessage(data.name, data.message);
+    }
+  };
+};
+
+function drawPlayers() {
+
+  document.querySelectorAll(".player").forEach(
+    element => element.remove()
+  );
+
+  Object.values(players).forEach(player => {
+
+    const element = document.createElement("div");
+
+    element.className = "player";
+
+    element.textContent =
+      player.id === myId ? "YOU" : "P";
+
+    element.style.left = player.x + "%";
+    element.style.top = player.y + "%";
+
+    game.appendChild(element);
+  });
+}
+
+function sendMove() {
+
+  if (!socket || socket.readyState !== WebSocket.OPEN)
+    return;
+
+  socket.send(JSON.stringify({
+    type: "move",
+    x: x,
+    y: y
+  }));
+}
+
+function movePlayer(dx, dy) {
+
+  x += dx;
+  y += dy;
+
+  x = Math.max(5, Math.min(95, x));
+  y = Math.max(8, Math.min(92, y));
+
+  sendMove();
+}
+
+chatInput.addEventListener("keydown", event => {
+
+  if (event.key === "Enter") {
+
+    const message = chatInput.value.trim();
+
+    if (!message) return;
+
+    socket.send(JSON.stringify({
+      type: "chat",
+      message: message
+    }));
+
+    chatInput.value = "";
+  }
+});
+
+function addMessage(name, message) {
+
+  const line = document.createElement("div");
+
+  line.innerHTML =
+    "<b>" + escapeHtml(name) +
+    ":</b> " + escapeHtml(message);
+
+  messages.appendChild(line);
+
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function escapeHtml(text) {
+
+  return text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+const joystick = document.getElementById("joystick");
+const stick = document.getElementById("stick");
+
+let dragging = false;
+
+function joystickMove(event) {
+
+  if (!dragging) return;
+
+  const rect = joystick.getBoundingClientRect();
+
+  const point = event.touches
+    ? event.touches[0]
+    : event;
+
+  let dx =
+    point.clientX -
+    (rect.left + rect.width / 2);
+
+  let dy =
+    point.clientY -
+    (rect.top + rect.height / 2);
+
+  const max = 38;
+
+  const distance =
+    Math.sqrt(dx * dx + dy * dy);
+
+  if (distance > max) {
+
+    dx = dx / distance * max;
+    dy = dy / distance * max;
+  }
+
+  stick.style.transform =
+    `translate(${dx}px, ${dy}px)`;
+
+  movePlayer(
+    dx / 120,
+    dy / 120
+  );
+}
+
+joystick.addEventListener("touchstart", () => {
+  dragging = true;
+});
+
+joystick.addEventListener("touchmove", joystickMove);
+
+joystick.addEventListener("touchend", () => {
+
+  dragging = false;
+
+  stick.style.transform =
+    "translate(0,0)";
+});
+
+</script>
+
+</body>
+</html>
