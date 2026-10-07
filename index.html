@@ -1,10 +1,205 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BizVerse</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f5f7fb;
+      color: #172033;
+    }
+
+    header {
+      background: #172033;
+      color: white;
+      padding: 18px 7%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    nav button {
+      background: transparent;
+      color: white;
+      border: 1px solid #ffffff55;
+      padding: 9px 15px;
+      border-radius: 7px;
+      margin-left: 7px;
+      cursor: pointer;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    .hero h1 {
+      font-size: 42px;
+      margin-bottom: 15px;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: #5f6b7a;
+      margin-bottom: 30px;
+    }
+
+    .buttons button {
+      padding: 13px 24px;
+      border: none;
+      border-radius: 8px;
+      margin: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .join {
+      background: #172033;
+      color: white;
+    }
+
+    .login {
+      background: white;
+      border: 1px solid #172033 !important;
+      color: #172033;
+    }
+
+    .section {
+      display: none;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 25px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px #00000012;
+    }
+
+    .section h2 {
+      margin-bottom: 20px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #ccd2dc;
+      border-radius: 7px;
+    }
+
+    .submit {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      background: #172033;
+      color: white;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+    }
+
+    .back {
+      margin-top: 12px;
+      background: none;
+      border: none;
+      color: #172033;
+      cursor: pointer;
+    }
+  </style>
 </head>
+
 <body>
+
+<header>
+  <div class="logo">BizVerse</div>
+  <nav>
+    <button onclick="showSection('loginSection')">Login</button>
+    <button onclick="showSection('registerSection')">Join</button>
+  </nav>
+</header>
+
+<div class="hero" id="home">
   <h1>Welcome to BizVerse 🚀</h1>
-  <p>Your business community starts here.</p>
+  <p>Connect. Discover. Grow your business.</p>
+
+  <div class="buttons">
+    <button class="join" onclick="showSection('registerSection')">
+      Create Business
+    </button>
+
+    <button class="login" onclick="showSection('loginSection')">
+      Login
+    </button>
+  </div>
+</div>
+
+<div class="section" id="registerSection">
+  <h2>Create Your BizVerse Account</h2>
+
+  <input type="text" placeholder="Full Name">
+  <input type="text" placeholder="Business Name">
+
+  <select>
+    <option>Select Business Category</option>
+    <option>Fashion</option>
+    <option>Food</option>
+    <option>Technology</option>
+    <option>Beauty</option>
+    <option>Retail</option>
+    <option>Services</option>
+    <option>Other</option>
+  </select>
+
+  <textarea placeholder="Tell us about your business"></textarea>
+
+  <input type="email" placeholder="Email">
+  <input type="password" placeholder="Create Password">
+
+  <button class="submit">Create Account</button>
+
+  <button class="back" onclick="showSection('home')">
+    ← Back
+  </button>
+</div>
+
+<div class="section" id="loginSection">
+  <h2>Welcome Back</h2>
+
+  <input type="email" placeholder="Email">
+  <input type="password" placeholder="Password">
+
+  <button class="submit">Login</button>
+
+  <button class="back" onclick="showSection('home')">
+    ← Back
+  </button>
+</div>
+
+<script>
+  function showSection(sectionId) {
+    document.getElementById("home").style.display = "none";
+    document.getElementById("registerSection").style.display = "none";
+    document.getElementById("loginSection").style.display = "none";
+
+    if (sectionId === "home") {
+      document.getElementById("home").style.display = "block";
+    } else {
+      document.getElementById(sectionId).style.display = "block";
+    }
+  }
+</script>
+
 </body>
 </html>
