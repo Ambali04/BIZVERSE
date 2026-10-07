@@ -213,7 +213,7 @@ const supabaseClient = supabase.createClient(
 console.log("BizVerse connected to Supabase");
 </script>
   <script>
-async function registerUser() {
+window.registerUser = async function() {
   const name = document.getElementById("name").value;
   const business = document.getElementById("business").value;
   const category = document.getElementById("category").value;
