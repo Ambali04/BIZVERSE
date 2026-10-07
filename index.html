@@ -200,6 +200,18 @@
     }
   }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script>
+const SUPABASE_URL = "https://wmunglodgsaekcentgrw.supabase.co/rest/v1/";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndtdW5nbG9kZ3NhZWtjZW50Z3J3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzNjEyMTAsImV4cCI6MjEwNjkzNzIxMH0._WOAGYnw4_Li59AIpizbV32xoOlLiOCDTAnlxnA6Gkc";
+
+const supabaseClient = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+console.log("BizVerse connected to Supabase");
+</script>
 </body>
 </html>
